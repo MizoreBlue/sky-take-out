@@ -1,15 +1,20 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -61,33 +67,49 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     /**
-     * 将新员工数据插入到数据库当中
+     * 新增员工
      * @param employeeDTO
      */
     public void save(EmployeeDTO employeeDTO) {
-//        将从前端接受都数据传输对象转换为插入数据库的对象
         Employee employee = new Employee();
+//        对前端的DTO数据传输对象转换成实体
+        BeanUtils.copyProperties(employeeDTO,employee);
 
-//        使用spring提供都工具类实现属性复制
-        BeanUtils.copyProperties(employeeDTO, employee);
-
-//      设置密码 默认为123456 定义在常量类当中
-        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
-
-//        设置账号状态 默认为1 表示可用，0为不可用
+//        填充剩下的属性 设置装好状态 1表示正常 0表示锁定
         employee.setStatus(StatusConstant.ENABLE);
 
-//        设置创建时间和修改时间
+//        设置密码，默认密码 123456
+        employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
+
+//        设置当前记录的创建时间和修改时间
         employee.setCreateTime(LocalDateTime.now());
         employee.setUpdateTime(LocalDateTime.now());
 
-//        设置创建该用户的当前用户Id
-        //TODO 之后需要修改成当前用户的实际id
-        employee.setCreateUser(10L);
-        employee.setUpdateUser(10L);
+//        设置当前记录创建人和修改人id
+        employee.setCreateUser(BaseContext.getCurrentId());
+        employee.setUpdateUser(BaseContext.getCurrentId());
 
-//        调用持久层接口，将数据持久化到数据库当中
+//        将封装好的数据插入到数据表中
         employeeMapper.insert(employee);
+    }
+
+
+    /**
+     * 员工分页查询
+     * @param employeePageQueryDTO
+     * @return
+     */
+    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+        // select * form employee limit 0,10 从0开始查询10条数据
+//        开始分页查询
+//        aop面向切面的编程，将sql语句拦截再加强
+        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+
+//        dao层
+        Page<Employee> page =  employeeMapper.pageQuery(employeePageQueryDTO);
+        long total = page.getTotal();
+        List<Employee> records = page.getResult();
+        return new PageResult(total,records);
     }
 
 }
