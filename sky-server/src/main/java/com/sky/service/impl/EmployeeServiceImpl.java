@@ -68,12 +68,13 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 新增员工
+     *
      * @param employeeDTO
      */
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
 //        对前端的DTO数据传输对象转换成实体
-        BeanUtils.copyProperties(employeeDTO,employee);
+        BeanUtils.copyProperties(employeeDTO, employee);
 
 //        填充剩下的属性 设置装好状态 1表示正常 0表示锁定
         employee.setStatus(StatusConstant.ENABLE);
@@ -96,6 +97,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     /**
      * 员工分页查询
+     *
      * @param employeePageQueryDTO
      * @return
      */
@@ -103,13 +105,32 @@ public class EmployeeServiceImpl implements EmployeeService {
         // select * form employee limit 0,10 从0开始查询10条数据
 //        开始分页查询
 //        aop面向切面的编程，将sql语句拦截再加强
-        PageHelper.startPage(employeePageQueryDTO.getPage(),employeePageQueryDTO.getPageSize());
+        PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
 
 //        dao层
-        Page<Employee> page =  employeeMapper.pageQuery(employeePageQueryDTO);
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
         long total = page.getTotal();
         List<Employee> records = page.getResult();
-        return new PageResult(total,records);
+        return new PageResult(total, records);
+    }
+
+    /**
+     * 启用禁用员工账号
+     *
+     * @param status
+     * @param id
+     */
+    public void startOrStop(Integer status, long id) {
+//        update employee set status = ?  where id = ?
+//       使用构建器构建一个对象，实现链式编程
+        Employee employee = Employee.builder()
+                .status(status)
+                .id(id)
+                .updateTime(LocalDateTime.now())
+                .updateUser(BaseContext.getCurrentId())
+                .build();
+
+        employeeMapper.update(employee);
     }
 
 }
