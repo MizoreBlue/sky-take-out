@@ -78,13 +78,14 @@ public class EmployeeController {
 
     /**
      * 新增员工
-     * */
+     *
+     */
     @PostMapping
     @ApiOperation("新增员工")
     public Result save(@RequestBody EmployeeDTO employeeDTO) {
-        log.info("新增员工:{}",employeeDTO);
+        log.info("新增员工:{}", employeeDTO);
         employeeService.save(employeeDTO);
-        return  Result.success();
+        return Result.success();
     }
 
     /**
@@ -92,15 +93,16 @@ public class EmployeeController {
      * 由于前端传递过来的不是Json而是Query
      * 则不需要添加@RequestBody注解
      * 由MVC框架直接获取
+     *
      * @param employeePageQueryDTO
      * @return
      */
     @GetMapping("/page")
     @ApiOperation("员工分页查询")
-    public Result<PageResult> page(EmployeePageQueryDTO  employeePageQueryDTO) {
-        log.info("员工分页查询参数为：{}",employeePageQueryDTO);
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO) {
+        log.info("员工分页查询参数为：{}", employeePageQueryDTO);
 //        service层
-        PageResult pageResult =  employeeService.pageQuery(employeePageQueryDTO);
+        PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);
         return Result.success(pageResult);
     }
 
@@ -109,15 +111,47 @@ public class EmployeeController {
      * 启用禁用员工账号
      * status为路径参数
      * id为query url?形式拼接的参数
+     * Query 为路径查询参数
      * @param status
      * @param id
      * @return
      */
     @PostMapping("status/{status}")
     @ApiOperation("禁用启用员工账号")
-    public Result startOrStop(@PathVariable Integer status,long id) {
-        log.info("启用禁用员工账号{},{}",status,id);
-         employeeService.startOrStop (status,id);
+    public Result startOrStop(@PathVariable Integer status, long id) {
+        log.info("启用禁用员工账号{},{}", status, id);
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    /**
+     * 根据id查询员工
+     * 为路径参数传参Path
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("根据员工id查询员工信息")
+    public Result<Employee> getById(@PathVariable Long id) {
+        log.info("根据员工id查询员工信息:{}",id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+
+
+    /**
+     * 编辑员工数据
+     * 数据传输对象DTO 前端的JSON反序列化为JAVA对象
+     * 参数采用application/jso格式
+     * @param employeeDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("编辑员工信息")
+    public Result update(@RequestBody EmployeeDTO employeeDTO){
+//        调用service层
+        log.info("编辑员工信息:{}", employeeDTO);
+        employeeService.update(employeeDTO);
         return Result.success();
     }
 }

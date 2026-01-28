@@ -12,7 +12,7 @@
         order by create_time desc
     </select>
 
-<!--    更新操作统一使用sql-->
+    <!--    更新操作统一使用sql-->
     <update id="update" parameterType="employee">
          update employee
          <set>
@@ -28,4 +28,5 @@
          </set>
          where id = #{id}
     </update>
+
 </mapper>
