@@ -70,4 +70,26 @@ public class CategoryServiceImpl implements CategoryService {
                 .build();
         categoryMapper.update(category);
     }
+
+    /**
+     * 新增分类
+     * @param categoryDTO
+     */
+    public void addCategory(CategoryDTO categoryDTO) {
+//        insert into category name() value()
+//        复制拷贝数据，将数据传输对象转换为对于的实体类对象
+        Category category = new Category();
+        BeanUtils.copyProperties(categoryDTO,category);
+
+//        添加其他属性 状态为默认禁用
+        category.setStatus(0);
+//        创建时间和创建用户信息
+        category.setCreateTime(LocalDateTime.now());
+        category.setCreateUser(BaseContext.getCurrentId());
+        category.setUpdateTime(LocalDateTime.now());
+        category.setUpdateUser(BaseContext.getCurrentId());
+
+//        调用mapper层
+        categoryMapper.insert(category);
+    }
 }

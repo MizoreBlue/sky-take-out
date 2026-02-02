@@ -27,4 +27,10 @@ public interface CategoryService {
      * @param id
      */
     void startOrStopCategory(Integer status, long id);
+
+    /**
+     * 新增分类
+     * @param categoryDTO
+     */
+    void addCategory(CategoryDTO categoryDTO);
 }

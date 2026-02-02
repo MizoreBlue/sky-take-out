@@ -68,4 +68,18 @@ public class CategoryController {
         categoryService.startOrStopCategory(status,id);
         return Result.success();
     }
+
+    /**
+     * 新增分类
+     * 参数类型为Json
+     * @param categoryDTO
+     * @return
+     */
+    @PostMapping
+    @ApiOperation("新增分类")
+    public Result addCategory(@RequestBody CategoryDTO categoryDTO) {
+        log.info("新增分类:{}", categoryDTO);
+        categoryService.addCategory(categoryDTO);
+        return  Result.success();
+    }
 }
