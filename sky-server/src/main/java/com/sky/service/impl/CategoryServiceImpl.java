@@ -92,4 +92,13 @@ public class CategoryServiceImpl implements CategoryService {
 //        调用mapper层
         categoryMapper.insert(category);
     }
+
+    /**
+     * 根据id删除分类
+     * @param categoryDTO
+     */
+    public void deleteById(CategoryDTO categoryDTO) {
+        Long categoryId = categoryDTO.getId();
+        categoryMapper.delete(categoryId);
+    }
 }

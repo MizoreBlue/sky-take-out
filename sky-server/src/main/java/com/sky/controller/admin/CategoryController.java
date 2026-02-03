@@ -82,4 +82,19 @@ public class CategoryController {
         categoryService.addCategory(categoryDTO);
         return  Result.success();
     }
+
+    /**
+     * 根据id删除分类
+     * query参数
+     * 采用数据传输对象接受
+     * @param categoryDTO
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation("根据id删除分类")
+    public Result deleteCategoryById(CategoryDTO categoryDTO) {
+        log.info("根据id删除分类:{}", categoryDTO);
+        categoryService.deleteById(categoryDTO);
+        return Result.success();
+    }
 }
