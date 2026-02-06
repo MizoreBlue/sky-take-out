@@ -5,6 +5,9 @@ import com.sky.dto.CategoryPageQueryDTO;
 import com.sky.entity.Category;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface CategoryMapper {
@@ -34,4 +37,7 @@ public interface CategoryMapper {
      */
     @Delete("delete from category where id = #{categoryId}")
     void delete(Long categoryId);
+
+    @Select("select * from category where type = #{type} order by create_time desc")
+    List<Category> select(Integer type);
 }
