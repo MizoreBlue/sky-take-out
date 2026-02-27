@@ -56,9 +56,9 @@ public class CategoryServiceImpl implements CategoryService {
 //        将数据传输对象转换为实体对象 使用工具类拷贝已有属性值
         BeanUtils.copyProperties(categoryDTO,category);
 //        设置其他属性 ，修改时间
-        category.setUpdateTime(LocalDateTime.now());
+//        category.setUpdateTime(LocalDateTime.now());
 //        修改用户id
-        category.setUpdateUser(BaseContext.getCurrentId());
+//        category.setUpdateUser(BaseContext.getCurrentId());
 //        调用mapper层
         categoryMapper.update(category);
     }
@@ -74,8 +74,8 @@ public class CategoryServiceImpl implements CategoryService {
                 .status(status)
                 //设置被修改的分类 id
                 .id(id)
-                .updateTime(LocalDateTime.now())
-                .updateUser(BaseContext.getCurrentId())
+                //.updateTime(LocalDateTime.now())
+                //.updateUser(BaseContext.getCurrentId())
                 .build();
         categoryMapper.update(category);
     }
@@ -93,10 +93,10 @@ public class CategoryServiceImpl implements CategoryService {
 //        添加其他属性 状态为默认禁用
         category.setStatus(0);
 //        创建时间和创建用户信息
-        category.setCreateTime(LocalDateTime.now());
-        category.setCreateUser(BaseContext.getCurrentId());
-        category.setUpdateTime(LocalDateTime.now());
-        category.setUpdateUser(BaseContext.getCurrentId());
+//        category.setCreateTime(LocalDateTime.now());
+//        category.setCreateUser(BaseContext.getCurrentId());
+//        category.setUpdateTime(LocalDateTime.now());
+//        category.setUpdateUser(BaseContext.getCurrentId());
 
 //        调用mapper层
         categoryMapper.insert(category);
@@ -109,6 +109,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteById(CategoryDTO categoryDTO) {
         //        当前分类有菜品关联时抛出异常
         Long categoryId = categoryDTO.getId();
+        // 查询当前分类关联的菜品数量
         Integer count = dishMapper.countByCategoryId(categoryId);
 
         if(count>0){
