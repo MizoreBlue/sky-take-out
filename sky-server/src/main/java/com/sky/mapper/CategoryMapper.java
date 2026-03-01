@@ -44,4 +44,12 @@ public interface CategoryMapper {
 
     @Select("select * from category where type = #{type} order by create_time desc")
     List<Category> select(Integer type);
+
+    /**
+     * 根据主键id查询分类名称
+     * @param id
+     * @return
+     */
+    @Select("select name from category where id = #{id}")
+    String getNameById(Long id);
 }
