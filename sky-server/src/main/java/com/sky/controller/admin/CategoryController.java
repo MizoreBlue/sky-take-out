@@ -97,7 +97,6 @@ public class CategoryController {
     @ApiOperation("根据id删除分类")
     public Result deleteCategoryById(CategoryDTO categoryDTO) {
         log.info("根据id删除分类:{}", categoryDTO);
-//        TODO 关联菜品时无法删除 外键捕获异常
         categoryService.deleteById(categoryDTO);
         return Result.success();
     }

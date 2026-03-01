@@ -113,7 +113,7 @@ public class CategoryServiceImpl implements CategoryService {
         Integer count = dishMapper.countByCategoryId(categoryId);
 
         if(count>0){
-//            若当前分类有菜品关联则跑出异常，不予删除
+//            若当前分类有菜品关联则抛出异常，不予删除
             throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
         }
 
