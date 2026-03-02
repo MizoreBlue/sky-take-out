@@ -8,6 +8,6 @@ sky:
     password: 025911
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: LTAI5tSmmNpRR3p3MAGyeepj
-    access-key-secret: 19tegsRToEMYKIkc2wxiEa0te1M2jM
+    access-key-id: 
+    access-key-secret: 
     bucket-name: sky-mizore
