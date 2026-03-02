@@ -71,10 +71,15 @@ public class DishController {
     /**
      * 修改菜品
      * body 参数
+     * json对象反序列化为Java
      * @param dishDTO
      * @return
      */
+    @PutMapping
+    @ApiOperation("修改菜品")
     public Result updateDish(@RequestBody DishDTO dishDTO){
+        log.info("修改菜品:{}",dishDTO);
+        dishService.updateDish(dishDTO);
         return Result.success();
     }
 
@@ -84,6 +89,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/{id}")
+    @ApiOperation("根据菜品Id查询菜品")
     public Result<DishVO>  getDishById(@PathVariable Long id){
         log.info("根据菜品Id查询菜品:{}",id);
         DishVO dishVO =  dishService.getByDishId(id);
