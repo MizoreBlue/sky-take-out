@@ -4,6 +4,7 @@ import com.sky.constant.JwtClaimsConstant;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
 import com.sky.result.PageResult;
@@ -73,6 +74,7 @@ public class EmployeeController {
     @PostMapping("/logout")
     @ApiOperation(value = "员工登出")
     public Result<String> logout() {
+//        TODO 员工退出登录，使得Token失效
         return Result.success();
     }
 
@@ -141,9 +143,9 @@ public class EmployeeController {
 
     /**
      * 编辑员工数据
-     * 数据传输对象DTO 前端的JSON反序列化为JAVA对象
-     * 参数采用application/jso格式
-     * @param employeeDTO
+     * 数据传输对象DTO 前端的JSON反序列 化为JAVA对象
+     * 参数采用application/json格式
+     * @param employeeDTO body参数
      * @return
      */
     @PutMapping
@@ -152,6 +154,18 @@ public class EmployeeController {
 //        调用service层
         log.info("编辑员工信息:{}", employeeDTO);
         employeeService.update(employeeDTO);
+        return Result.success();
+    }
+
+    /**
+     * 修改员工密码
+     * body参数
+     * @param passwordEditDTO
+     * @return
+     */
+    public Result modifyEmployeePassword(@RequestBody PasswordEditDTO passwordEditDTO){
+        log.info("修改员工密码:{}", passwordEditDTO);
+        employeeService.modifyEmployeePassword(passwordEditDTO);
         return Result.success();
     }
 }
