@@ -1,6 +1,7 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
@@ -66,7 +67,7 @@ public class EmployeeController {
         return Result.success(employeeLoginVO);
     }
 
-    /**
+    /*  *
      * 退出
      *
      * @return
@@ -74,7 +75,7 @@ public class EmployeeController {
     @PostMapping("/logout")
     @ApiOperation(value = "员工登出")
     public Result<String> logout() {
-//        TODO 员工退出登录，使得Token失效
+        log.info("ID:{},员工登出", BaseContext.getCurrentId());
         return Result.success();
     }
 
@@ -163,6 +164,8 @@ public class EmployeeController {
      * @param passwordEditDTO
      * @return
      */
+    @PutMapping("/editPassword")
+    @ApiOperation("修改员工密码")
     public Result modifyEmployeePassword(@RequestBody PasswordEditDTO passwordEditDTO){
         log.info("修改员工密码:{}", passwordEditDTO);
         employeeService.modifyEmployeePassword(passwordEditDTO);
