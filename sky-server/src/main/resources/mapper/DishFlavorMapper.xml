@@ -19,7 +19,7 @@
             #{dishId}
         </foreach>
     </delete>
-<!--    更行彩菜品口味数据-->
+<!--    更新彩菜品口味数据-->
     <update id="updateByDishId">
         update dish_flavor
         <set>

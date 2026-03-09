@@ -3,6 +3,7 @@ package com.sky.controller.admin;
 import com.sky.constant.MessageConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.DishService;
@@ -94,5 +95,20 @@ public class DishController {
         log.info("根据菜品Id查询菜品:{}",id);
         DishVO dishVO =  dishService.getByDishId(id);
         return Result.success(dishVO);
+    }
+
+
+    /**
+     * query参数
+     * 根据分类id查询菜品
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("根据分类id查询菜品")
+    public Result<List<Dish>> getDishListByCategoryId(Long categoryId){
+        log.info("根据分类id查询菜品:{}",categoryId);
+        List<Dish> dishes = dishService.getByCategoryId(categoryId);
+        return Result.success(dishes);
     }
 }
