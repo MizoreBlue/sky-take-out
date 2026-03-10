@@ -12,6 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @Api(tags = "套餐相关接口")
@@ -61,4 +63,46 @@ public class SetMealController {
         PageResult pageResult =  setmealService.pageQuery(setmealPageQueryDTO);
         return Result.success(pageResult) ;
     }
+
+    /**
+     * path参数 status
+     * query参数 id
+     * 停售起售套餐
+     * @param status
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("套餐起售停售")
+    public Result setSetMealStatus(@PathVariable Integer status ,Long id){
+        log.info("停售起售套餐:type={},id={}",status,id);
+        setmealService.setStatus(status,id);
+        return Result.success();
+    }
+
+
+    /**
+     * 批量删除套餐
+     * query参数
+     * @param ids
+     * 使用注解将参数解析为集合
+     * @return
+     */
+    @DeleteMapping
+    @ApiOperation("批量删除套餐")
+    public Result deleteSetMealByIds(@RequestParam List<Long> ids){
+        log.info("批量删除套餐:{}",ids);
+        setmealService.deleteBatchByIds(ids);
+        return Result.success();
+    }
+
+    /**
+     * 新曾套餐
+     * 参数类型为Body
+     * @param setmealDTO
+     * @return
+     */
+    public Result insertSetMeal(@RequestBody SetmealDTO setmealDTO){
+        return null;
+    }
+
 }

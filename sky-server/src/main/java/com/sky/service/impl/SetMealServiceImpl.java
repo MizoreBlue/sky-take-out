@@ -11,6 +11,7 @@ import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.SetMealService;
 import com.sky.vo.SetmealVO;
+import io.swagger.models.auth.In;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class SetMealServiceImpl implements SetMealService {
 
     /**
      * 修改套餐
+     *
      * @param setmealDTO
      */
     public void modifySetMeal(SetmealDTO setmealDTO) {
@@ -51,24 +53,44 @@ public class SetMealServiceImpl implements SetMealService {
 
     /**
      * 根据id查询套餐
+     *
      * @param id
      * @return
      */
     public SetmealVO getById(Long id) {
         SetmealVO setmealVO = new SetmealVO();
 //        分别查询套餐数据和关联的菜品数据
-        Setmeal setmeal =  setMealMapper.getById(id);
+        Setmeal setmeal = setMealMapper.getById(id);
 //        批量拆套餐相关的菜品数据
         List<SetmealDish> dishes = setmealDishMapper.getById(id);
 
 //        封装成Vo数据 返回至前端
-        BeanUtils.copyProperties(setmeal,setmealVO);
+        BeanUtils.copyProperties(setmeal, setmealVO);
         setmealVO.setSetmealDishes(dishes);
         return setmealVO;
     }
 
     /**
+     * 停售 起售套餐
+     *
+     * @param status
+     */
+    public void setStatus(Integer status, Long id) {
+        setMealMapper.setStatus(status, id);
+    }
+
+    /**
+     * 批量删除套餐
+     * @param setMealIds
+     */
+    public void deleteBatchByIds(List<Long> setMealIds) {
+        //TODO 删除套餐时，一并删除setmeal_dish表中的数据
+        setMealMapper.deleteBatchByIds(setMealIds);
+    }
+
+    /**
      * 菜品分页查询
+     *
      * @param setmealPageQueryDTO
      * @return
      */
@@ -77,7 +99,7 @@ public class SetMealServiceImpl implements SetMealService {
 //        开始分页查询
 //        aop面向切面的编程，将sql语句拦截再加强
         PageHelper.startPage(setmealPageQueryDTO.getPage(), setmealPageQueryDTO.getPageSize());
-       Page<SetmealVO> page = setMealMapper.pageQuery(setmealPageQueryDTO);
+        Page<SetmealVO> page = setMealMapper.pageQuery(setmealPageQueryDTO);
         long total = page.getTotal();
         List<SetmealVO> records = page.getResult();
         return new PageResult(total, records);

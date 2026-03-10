@@ -6,6 +6,9 @@ import com.sky.entity.Setmeal;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import java.util.List;
 
 @Mapper
 public interface SetMealMapper {
@@ -26,6 +29,25 @@ public interface SetMealMapper {
      */
     void modifySetMeal(Setmeal setmeal);
 
+    /**
+     * 根据id查询套餐
+     * @param id
+     * @return
+     */
     @Select("select * from setmeal where id = #{id}")
     Setmeal getById(Long id);
+
+    /**
+     * 起售、禁售套餐
+     * @param status
+     * @param id
+     */
+    @Update("update setmeal set status = #{status} where id =#{id}")
+    void setStatus(Integer status,Long id);
+
+    /**
+     * 批量删除套餐
+     * @param setMealIds
+     */
+    void deleteBatchByIds(List<Long> setMealIds);
 }

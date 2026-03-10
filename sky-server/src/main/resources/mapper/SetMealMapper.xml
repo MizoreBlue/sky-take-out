@@ -20,7 +20,7 @@
         order by s.create_time desc
     </select>
 
-<!--    修改套餐-->
+    <!--    修改套餐-->
     <update id="modifySetMeal">
         update setmeal
         <set>
@@ -36,4 +36,11 @@
         where id = #{id}
     </update>
 
+<!--    批量删除套餐-->
+    <delete id="deleteBatchByIds">
+        delete from setmeal where id in
+        <foreach collection="setMealIds" item="setMealId" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>
