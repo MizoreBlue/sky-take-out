@@ -105,4 +105,19 @@ public class SetMealController {
         return null;
     }
 
+
+    /**
+     * 新增套餐
+     * Body参数
+     * @param setmealVO
+     * @return
+     */
+    @PostMapping
+    @ApiOperation("新增套餐")
+    public Result insertSetMeal(@RequestBody SetmealVO setmealVO){
+        log.info("新增套餐:{}",setmealVO);
+        setmealService.insert(setmealVO);
+        return Result.success();
+    }
+
 }

@@ -36,11 +36,17 @@
         where id = #{id}
     </update>
 
-<!--    批量删除套餐-->
+    <!--    批量删除套餐-->
     <delete id="deleteBatchByIds">
         delete from setmeal where id in
         <foreach collection="setMealIds" item="setMealId" separator="," open="(" close=")">
-            #{id}
+            #{setMealId}
         </foreach>
     </delete>
+
+<!--    插入套餐数据 并回显主键id-->
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into setmeal (id, category_id,name,price,status,description,image, create_time, update_time, create_user, update_user)
+        VALUES (#{id},#{categoryId},#{name},#{price},#{status},#{description},#{image},#{createTime},#{updateTime},#{createUser},#{updateUser})
+    </insert>
 </mapper>

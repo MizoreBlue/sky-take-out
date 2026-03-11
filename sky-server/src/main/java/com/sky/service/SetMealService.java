@@ -39,4 +39,10 @@ public interface SetMealService {
      * @param ids
      */
     void deleteBatchByIds(List<Long> ids);
+
+    /**
+     * 插入套餐
+     * @param setmealVO
+     */
+    void insert(SetmealVO setmealVO);
 }

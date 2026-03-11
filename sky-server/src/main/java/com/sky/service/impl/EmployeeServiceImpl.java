@@ -171,7 +171,6 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param passwordEditDTO
      */
     public void modifyEmployeePassword(PasswordEditDTO passwordEditDTO) {
-        //TODO 修改员工密码
 //        判断旧密码与原始密码是否一致
         String oldPassword = passwordEditDTO.getOldPassword();
         oldPassword = DigestUtils.md5DigestAsHex(oldPassword.getBytes());

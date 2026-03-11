@@ -3,6 +3,21 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.SetmealDishMapper">
 
+    <!--    批量插入 套餐，菜品关联的数据-->
+    <insert id="insertBatch">
+        insert into setmeal_dish (copies,dish_id,name,price,setmeal_id) VALUES
+        <foreach collection="dishes" item="dish" separator=",">
+            (#{dish.copies},#{dish.dishId},#{dish.name},#{dish.price},#{dish.setmealId})
+        </foreach>
+    </insert>
+
+<!--    批量删除setmeal_dish行数据-->
+    <delete id="deleteBySetMealIds">
+        delete from setmeal_dish where setmeal_id in
+        <foreach collection="setMealIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
     <!--    参数为Long星数组，需要动态sql拼接查询-->
     <select id="getSetmealIdsByDishId" resultType="java.lang.Long">
@@ -11,13 +26,5 @@
             #{dishId}
         </foreach>
     </select>
-
-    <!--    批量插入 套餐，菜品关联的数据-->
-    <insert id="insertBatch">
-        insert into setmeal_dish (copies,dish_id,name,price,setmeal_id) VALUES
-        <foreach collection="dishes" item="dish" separator=",">
-            (#{dish.copies},#{dish.dishId},#{dish.name},#{dish.price},#{dish.setmealId})
-        </foreach>
-    </insert>
 
 </mapper>

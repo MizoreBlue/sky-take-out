@@ -15,7 +15,9 @@ import io.swagger.models.auth.In;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -28,8 +30,32 @@ public class SetMealServiceImpl implements SetMealService {
     private SetmealDishMapper setmealDishMapper;
 
     /**
+     * 插入套餐
+     * @param setmealVO
+     */
+    public void insert(SetmealVO setmealVO) {
+
+        Setmeal setmeal = new Setmeal();
+
+//        将套餐数据插入setmeal表
+        BeanUtils.copyProperties(setmealVO, setmeal);
+        setMealMapper.insert(setmeal);
+
+//        将和套餐关联的数据插入setmeal_dish表
+//        将插入生成的id回显
+        Long setmealId = setmeal.getId();
+        List<SetmealDish> dishes = setmealVO.getSetmealDishes();
+//        设置setmeal_dish关联的套餐id
+        Iterator<SetmealDish> iterator = dishes.iterator();
+        while (iterator.hasNext()) {
+            SetmealDish dish = iterator.next();
+            dish.setSetmealId(setmealId);
+        }
+        setmealDishMapper.insertBatch(dishes);
+    }
+
+    /**
      * 修改套餐
-     *
      * @param setmealDTO
      */
     public void modifySetMeal(SetmealDTO setmealDTO) {
@@ -83,9 +109,12 @@ public class SetMealServiceImpl implements SetMealService {
      * 批量删除套餐
      * @param setMealIds
      */
+    @Transactional
     public void deleteBatchByIds(List<Long> setMealIds) {
-        //TODO 删除套餐时，一并删除setmeal_dish表中的数据
+//        删除套餐表数据
         setMealMapper.deleteBatchByIds(setMealIds);
+//        删除setmeal_dish表数据
+        setmealDishMapper.deleteBySetMealIds(setMealIds);
     }
 
     /**
