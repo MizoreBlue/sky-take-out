@@ -111,4 +111,17 @@ public class DishController {
         List<Dish> dishes = dishService.getByCategoryId(categoryId);
         return Result.success(dishes);
     }
+
+    /**
+     *
+     * @param status path
+     * @param id query
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    public Result setDishStatus(@PathVariable Integer status,long id){
+        log.info("起售禁售菜品:{},{}",status,id);
+        dishService.setDishStatus(status,id);
+        return Result.success();
+    }
 }

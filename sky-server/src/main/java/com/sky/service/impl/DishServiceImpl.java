@@ -121,6 +121,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根据菜品Id查询菜品
+     *
      * @param id
      * @return
      */
@@ -143,6 +144,7 @@ public class DishServiceImpl implements DishService {
     /**
      * 修改菜品
      * 关系到两个表的数据处理，需要添加事物注解
+     *
      * @param dishDTO
      */
     @Transactional
@@ -153,12 +155,13 @@ public class DishServiceImpl implements DishService {
 //        service层
         dishMapper.updateDish(dish);
 
+//        初次提交数据时dishId==null 二次提交时有数据
         for (DishFlavor flavor : dishDTO.getFlavors()) {
             flavor.setDishId(dish.getId());
         }
 
 //        保存对应的口味数据
-        if(dishDTO.getFlavors() != null && dishDTO.getFlavors().size() > 0) {
+        if (dishDTO.getFlavors() != null && dishDTO.getFlavors().size() > 0) {
 //            若菜品无最初的菜品口味数据，则改为插入菜品口味数据
 //            先清空对应的口味数据，在进行口味数据添加
             dishFlavorMapper.deleteByDishId(dish.getId());
@@ -167,15 +170,27 @@ public class DishServiceImpl implements DishService {
         } else {
             dishFlavorMapper.deleteByDishId(dish.getId());
         }
-     }
+    }
 
     /**
      * 根据分类id查询菜品
+     *
      * @param categoryId
      * @return
      */
     public List<Dish> getByCategoryId(Long categoryId) {
         return dishMapper.getByCategoryId(categoryId);
+    }
+
+    /**
+     * 根据id起售禁售菜品
+     *
+     * @param status path
+     * @param dishId query
+     */
+    public void setDishStatus(Integer status, Long dishId) {
+        Dish build = Dish.builder().status(status).id(dishId).build();
+        dishMapper.updateDish(build);
     }
 
 }
