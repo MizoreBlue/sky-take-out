@@ -9,6 +9,7 @@ import com.sky.entity.SetmealDish;
 import com.sky.mapper.SetMealMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
+import com.sky.result.Result;
 import com.sky.service.SetMealService;
 import com.sky.vo.SetmealVO;
 import io.swagger.models.auth.In;
@@ -31,6 +32,7 @@ public class SetMealServiceImpl implements SetMealService {
 
     /**
      * 插入套餐
+     *
      * @param setmealVO
      */
     public void insert(SetmealVO setmealVO) {
@@ -56,6 +58,7 @@ public class SetMealServiceImpl implements SetMealService {
 
     /**
      * 修改套餐
+     *
      * @param setmealDTO
      */
     public void modifySetMeal(SetmealDTO setmealDTO) {
@@ -107,6 +110,7 @@ public class SetMealServiceImpl implements SetMealService {
 
     /**
      * 批量删除套餐
+     *
      * @param setMealIds
      */
     @Transactional
@@ -132,5 +136,15 @@ public class SetMealServiceImpl implements SetMealService {
         long total = page.getTotal();
         List<SetmealVO> records = page.getResult();
         return new PageResult(total, records);
+    }
+
+    /**
+     * 根据分类id获取套餐集合
+     *
+     * @param categoryId
+     * @return
+     */
+    public List<Setmeal> getByCategoryId(Long categoryId) {
+        return setMealMapper.getSetmealsById(categoryId);
     }
 }

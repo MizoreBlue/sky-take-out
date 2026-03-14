@@ -12,9 +12,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * 菜品管理
@@ -26,6 +28,8 @@ import java.util.List;
 public class DishController {
     @Autowired
     private DishService dishService;
+    @Autowired
+    private RedisTemplate redisTemplate;
     /**
      * 新曾菜品
      * 前端参数格式为json
@@ -65,6 +69,10 @@ public class DishController {
     @ApiOperation("单个或批量删除菜品")
     public Result deleteDish(@RequestParam List<Long> ids){
         log.info("菜品批量删除");
+
+//        清除缓存
+        clearCache("dish_");
+
         dishService.deleteBatch(ids);
         return Result.success();
     }
@@ -80,6 +88,10 @@ public class DishController {
     @ApiOperation("修改菜品")
     public Result updateDish(@RequestBody DishDTO dishDTO){
         log.info("修改菜品:{}",dishDTO);
+
+//        清除缓存
+        clearCache("dish_"+dishDTO.getCategoryId());
+
         dishService.updateDish(dishDTO);
         return Result.success();
     }
@@ -121,7 +133,22 @@ public class DishController {
     @PostMapping("/status/{status}")
     public Result setDishStatus(@PathVariable Integer status,long id){
         log.info("起售禁售菜品:{},{}",status,id);
+
+//      清除缓存
+        clearCache("dish_*");
+
         dishService.setDishStatus(status,id);
         return Result.success();
+    }
+
+
+    /**
+     * 清理redis缓存
+     * @param pattern
+     */
+    private void clearCache(String pattern){
+//       根据正则获取keys
+        Set  keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 }
