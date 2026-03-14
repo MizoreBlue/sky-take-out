@@ -42,7 +42,6 @@ public interface CategoryMapper {
     @Delete("delete from category where id = #{categoryId}")
     void delete(Long categoryId);
 
-    @Select("select * from category where type = #{type} order by create_time desc")
     List<Category> select(Integer type);
 
     /**

@@ -19,7 +19,7 @@
             #{dishId}
         </foreach>
     </delete>
-<!--    更新彩菜品口味数据-->
+    <!--    更新彩菜品口味数据-->
     <update id="updateByDishId">
         update dish_flavor
         <set>
@@ -28,4 +28,12 @@
         </set>
         where dish_id = #{dishId}
     </update>
+
+    <!--根据菜品id批量查询菜品口味-->
+    <select id="getListByDishIds" resultType="com.sky.entity.DishFlavor">
+        select * from dish_flavor where dish_id in
+        <foreach collection="dishIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

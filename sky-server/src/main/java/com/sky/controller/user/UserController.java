@@ -35,8 +35,8 @@ public class UserController {
     /**
      * 参数类型 body
      * 传回来的json格式的数据
-     * @param userLoginDTO
-     * @return
+     * @param userLoginDTO body
+     * @return Vo
      */
     @PostMapping("/login")
     @ApiOperation("用户登录接口")
@@ -51,13 +51,13 @@ public class UserController {
         String token = JwtUtil.createJWT(jwtProperties.getUserSecretKey(), jwtProperties.getUserTtl(), claims);
 
 
-//        构建与前端交互的视图象
+//        构建与前端交互的视图象·
         UserLoginVO userLoginVO = UserLoginVO.builder()
                 .id(user.getId())
                 .openid(user.getOpenid())
                 .token(token)
                 .build();
 
-        return Result.success(userLoginVO);
+            return Result.success(userLoginVO);
     }
 }

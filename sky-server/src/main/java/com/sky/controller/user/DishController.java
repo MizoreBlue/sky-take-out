@@ -1,6 +1,5 @@
-package com.sky.controller.admin;
+package com.sky.controller.user;
 
-import com.sky.constant.MessageConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -19,9 +18,9 @@ import java.util.List;
 /**
  * 菜品管理
  */
-@RestController
+@RestController("userDishController")
 @Api(tags = "菜品管理相关接口")
-@RequestMapping("/admin/dish")
+@RequestMapping("/user/dish")
 @Slf4j
 public class DishController {
     @Autowired
@@ -92,7 +91,7 @@ public class DishController {
     @GetMapping("/{id}")
     @ApiOperation("根据菜品Id查询菜品")
     public Result<DishVO>  getDishById(@PathVariable Long id){
-        log.info("根据菜品Id查询菜品:{}",id);
+        log.info("User:根据菜品Id查询菜品:{}",id);
         DishVO dishVO =  dishService.getByDishId(id);
         return Result.success(dishVO);
     }
@@ -106,9 +105,9 @@ public class DishController {
      */
     @GetMapping("/list")
     @ApiOperation("根据分类id查询菜品")
-    public Result<List<Dish>> getDishListByCategoryId(Long categoryId){
-        log.info("Admin:根据分类id查询菜品:{}",categoryId);
-        List<Dish> dishes = dishService.getByCategoryId(categoryId);
+    public Result<List<DishVO>> getDishListByCategoryId(Long categoryId){
+        log.info("根据分类id查询菜品:{}",categoryId);
+        List<DishVO> dishes = dishService.getDishWithFlavorByCategoryId(categoryId);
         return Result.success(dishes);
     }
 

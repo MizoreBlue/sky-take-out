@@ -59,4 +59,11 @@ public interface DishService {
      * @param dishId
      */
     void setDishStatus(Integer status, Long dishId);
+
+    /**
+     * User
+     * @param categoryId 分类id
+     * @return Vo
+     */
+    List<DishVO> getDishWithFlavorByCategoryId(Long categoryId);
 }

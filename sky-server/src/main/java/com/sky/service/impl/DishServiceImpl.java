@@ -21,7 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 public class DishServiceImpl implements DishService {
@@ -192,5 +192,48 @@ public class DishServiceImpl implements DishService {
         Dish build = Dish.builder().status(status).id(dishId).build();
         dishMapper.updateDish(build);
     }
+
+
+    /**
+     * User
+     *
+     * @param categoryId 分类id
+     * @return DishVo
+     */
+    public List<DishVO> getDishWithFlavorByCategoryId(Long categoryId) {
+        // 1. 根据分类id查询菜品集合
+        List<Dish> dishes = dishMapper.getByCategoryId(categoryId);
+
+
+        // 2. 收集菜品ID和分类ID
+        List<Long> dishIds = new ArrayList<>();
+        for (Dish dish : dishes) {
+            dishIds.add(dish.getId());
+        }
+
+
+        // 4. 批量查询口味，并按菜品ID分组
+        List<DishFlavor> flavors = dishFlavorMapper.getListByDishIds(dishIds); //这里是所有菜品口味数据
+        Map<Long, List<DishFlavor>> flavorMap = new HashMap<>();
+        for (DishFlavor flavor : flavors) {
+            Long dishId = flavor.getDishId();
+            // 如果Map中还没有该菜品的口味列表，则创建新的ArrayList
+            List<DishFlavor> list = flavorMap.computeIfAbsent(dishId, k -> new ArrayList<>());
+            list.add(flavor);
+        }
+
+        // 5. 组装DishVO
+        List<DishVO> dishVOS = new ArrayList<>();
+        for (Dish dish : dishes) {
+            DishVO vo = new DishVO();
+            BeanUtils.copyProperties(dish, vo);
+            // 设置口味列表（如果没有口味，返回空列表）
+            vo.setFlavors(flavorMap.getOrDefault(dish.getId(), new ArrayList<>()));
+            dishVOS.add(vo);
+        }
+
+        return dishVOS;
+    }
+
 
 }

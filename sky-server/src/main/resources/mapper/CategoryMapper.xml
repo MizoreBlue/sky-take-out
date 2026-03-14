@@ -37,4 +37,12 @@
         VALUES (#{type},#{name},#{sort},#{status},#{createUser},#{updateUser},#{updateTime},#{createTime})
     </insert>
 
+    <select id="select" resultType="com.sky.entity.Category">
+        select * from category
+        <where>
+            <if test="type != null">type = #{type}</if>
+        </where>
+        order by create_time desc
+    </select>
+
 </mapper>
