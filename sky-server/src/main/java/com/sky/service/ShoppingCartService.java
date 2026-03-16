@@ -2,7 +2,10 @@ package com.sky.service;
 
 import com.sky.dto.ShoppingCartDTO;
 import com.sky.dto.UserLoginDTO;
+import com.sky.entity.ShoppingCart;
 import com.sky.entity.User;
+
+import java.util.List;
 
 public interface ShoppingCartService {
 
@@ -11,4 +14,16 @@ public interface ShoppingCartService {
      * @param shoppingCartDTO body
      */
     void add(ShoppingCartDTO shoppingCartDTO);
+
+
+    /**
+     * 查看购物车
+     * @return List
+     */
+    List<ShoppingCart> getList();
+
+    /**
+     * 清空购物车
+     */
+    void clean();
 }

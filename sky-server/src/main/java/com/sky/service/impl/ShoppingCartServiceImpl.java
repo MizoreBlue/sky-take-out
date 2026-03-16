@@ -90,4 +90,25 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
 
     }
+
+
+    /**
+     * 查看购物车
+     * @return List
+     */
+    public List<ShoppingCart> getList() {
+//        根据用户 id 获取购物车数据
+
+        ShoppingCart cart = new ShoppingCart();
+        cart.setUserId(BaseContext.getCurrentId());
+        return shoppingCartMapper.list(cart);
+    }
+
+
+    /**
+     * 清空购物车
+     */
+    public void clean() {
+        shoppingCartMapper.cleanByUserId(BaseContext.getCurrentId());
+    }
 }
