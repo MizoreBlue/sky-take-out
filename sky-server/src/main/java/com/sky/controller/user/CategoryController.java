@@ -26,7 +26,7 @@ public class CategoryController {
      * 根据类型查询分类
      * Query查询参数
      * 反回一个list集合
-     * @param type
+     * @param type Query
      * @return
      */
     @GetMapping("/list")

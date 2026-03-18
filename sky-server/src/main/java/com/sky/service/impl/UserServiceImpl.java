@@ -67,6 +67,8 @@ public class UserServiceImpl implements UserService {
         map.put("secret", weChatProperties.getSecret());
         map.put("js_code", userLoginDTO.getCode());
         map.put("grant_type", "authorization_code");
+
+//        发起http请求
         String json = HttpClientUtil.doGet(WX_LOGIN, map);
 
 //        获取从微信接口服务返回的用户唯一标识并反序列化为 Java 对象
