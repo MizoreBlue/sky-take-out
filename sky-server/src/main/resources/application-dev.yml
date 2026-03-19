@@ -8,11 +8,14 @@ sky:
     password: 025911
   alioss:
     endpoint: oss-cn-beijing.aliyuncs.com
-    access-key-id: 
-    access-key-secret: 
+    access-key-id: LTAI5t6JHUCsQaBCdZtqYTu5
+    access-key-secret:
     bucket-name: sky-mizore
   redis:
     host: localhost
     port: 6379
     database: 10
+  wechat:
+    appid: wx827cd5618183312a
+    secret:
 
