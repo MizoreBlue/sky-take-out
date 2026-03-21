@@ -32,7 +32,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderServiceControllerImpl implements OrderService {
+public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private ShoppingCartMapper shoppingCartMapper;
@@ -91,12 +91,13 @@ public class OrderServiceControllerImpl implements OrderService {
         orders.setNumber(String.valueOf(System.currentTimeMillis()));//当前时间戳
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
+//        TODO 也许存在需要但尚未插入的数据
         orders.setUserId(BaseContext.getCurrentId());
 
         orderMapper.insert(orders);
 
 //        向订单明细表插入n 条数据 批量插入
-        ArrayList<OrderDetail> orderDetails = new ArrayList<>();
+        List<OrderDetail> orderDetails = new ArrayList<>();
         for (ShoppingCart Cart : list) {
             OrderDetail orderDetail = new OrderDetail();
             BeanUtils.copyProperties(Cart, orderDetail);
@@ -177,6 +178,7 @@ public class OrderServiceControllerImpl implements OrderService {
      * 催单
      * @param id 订单 id
      */
+//    TODO 催单
     public void reminder(Long id) {
     }
 
@@ -197,6 +199,8 @@ public class OrderServiceControllerImpl implements OrderService {
         List<OrderVO> list = new ArrayList<>();
 
         if (orderList != null && !orderList.isEmpty()) {
+
+//            TODO 由于订单未支付超时自动取消。需要设置订单状态
 //        查出来的订单不为空 提取订单Id列表
             List<Long> orderIds = orderList.stream()
                     .map(Orders::getId)
@@ -221,5 +225,86 @@ public class OrderServiceControllerImpl implements OrderService {
             }
         }
         return new PageResult(page.getTotal(),list);
+    }
+
+
+    /**
+     * 再来一单
+     * @param id orderId
+     */
+    @Transactional
+    public void repetition(Long id) {
+//        重复相同的订单。将订单id查询出来更新数据再插入
+        Orders orders =  orderMapper.getByOrderId(id);
+        if (orders != null) {
+//            重新设置订单数据
+            orders.setId(null);
+            orders.setOrderTime(LocalDateTime.now());
+            orders.setPayStatus(Orders.UN_PAID);
+            orders.setStatus(Orders.PENDING_PAYMENT);
+            orders.setNumber(String.valueOf(System.currentTimeMillis()));//当前时间戳
+            orderMapper.insert(orders);
+
+//            向订单明细表插入数据
+            List<OrderDetail> orderDetails = orderDetailMapper.getByOrderIds(Collections.singletonList(id));
+            for (OrderDetail orderDetail : orderDetails) {
+//                插入回显回来的主键id 数据
+                orderDetail.setOrderId(orders.getId());
+            }
+            orderDetailMapper.insertBatch(orderDetails);
+        }
+    }
+
+
+    /**
+     * 取消订单
+     * @param id orderId
+     */
+    @Transactional
+    public void orderCancel(Long id) {
+        Orders orders = orderMapper.getByOrderId(id);
+        if (orders != null) {
+            Integer status = orders.getStatus();
+            if (Objects.equals(status, Orders.UN_PAID)) {
+//                如果订单尚未支付，可以直接取消
+//            更新订单状态
+                orders.setStatus(Orders.CANCELLED);
+//            修改订单
+            } else if(Objects.equals(status, Orders.PAID)) {
+//                如果订单已经支付，执行退款程序
+//                TODO 执退款程序
+                this.refund(id);
+//                退款成功，设置订单状态
+                orders.setStatus(Orders.CANCELLED);
+                orders.setPayStatus(Orders.REFUND);
+                orders.setCancelTime(LocalDateTime.now());
+            }
+            orderMapper.update(orders);
+        }
+    }
+
+
+    /**
+     * 订单退款
+     * @param id orderId
+     */
+    public void refund(Long id) {
+
+    }
+
+
+    /**
+     * 查看订单详情
+     * @param id orderId
+     * @return
+     */
+    public OrderVO getOrderDetail(Long id) {
+        Orders orders = orderMapper.getByOrderId(id);
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderIds(Collections.singletonList(id));
+//        组装 VO
+        OrderVO orderVO = new OrderVO();
+        BeanUtils.copyProperties(orders, orderVO);
+        orderVO.setOrderDetailList(orderDetails);
+        return orderVO;
     }
 }

@@ -10,6 +10,7 @@ import com.sky.result.Result;
 import com.sky.service.OrderService;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
+import com.sky.vo.OrderVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -85,5 +86,47 @@ public class OrderController {
         log.info("获取历史订单:{}",ordersPageQueryDTO);
          PageResult result = orderService.pageQuery(ordersPageQueryDTO);
          return Result.success(result);
+    }
+
+
+    /**
+     * 再来一单
+     * @param id path
+     * @return result
+     */
+    @PostMapping("/repetition/{id}")
+    @ApiOperation("再来一单")
+    public Result repetition(@PathVariable Long id){
+        log.info("再来一单:{}",id);
+        orderService.repetition(id);
+        return Result.success();
+    }
+
+
+    /**
+     * 取消订单
+     * @param id orderId
+     * @return result
+     */
+    @PutMapping("/cancel/{id}")
+    @ApiOperation("取消订单")
+    public Result OrderCancel(@PathVariable Long id){
+        log.info("取消订单:{}",id);
+        orderService.orderCancel(id);
+        return Result.success();
+    }
+
+
+    /**
+     * 查看订单详情
+     * @param id
+     * @return
+     */
+    @GetMapping("/orderDetail/{id}")
+    @ApiOperation("查看订单详情")
+    public Result<OrderVO> orderDetail(@PathVariable Long id){
+        log.info("查看订单详情:{}",id);
+       OrderVO orderVO =  orderService.getOrderDetail(id);
+        return Result.success(orderVO);
     }
 }

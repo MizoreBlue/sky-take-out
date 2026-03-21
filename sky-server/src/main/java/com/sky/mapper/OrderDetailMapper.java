@@ -14,7 +14,7 @@ public interface OrderDetailMapper {
      * 批量插入Order 数据
      * @param orderDetails list
      */
-    void insertBatch(ArrayList<OrderDetail> orderDetails);
+    void insertBatch(List<OrderDetail> orderDetails);
 
 
     /**
