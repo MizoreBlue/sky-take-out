@@ -6,6 +6,8 @@ import com.sky.entity.Setmeal;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetMealService;
+import com.sky.vo.DishItemVO;
+import com.sky.vo.DishVO;
 import com.sky.vo.SetmealVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -134,5 +136,19 @@ public class SetMealController {
         log.info("getSetMealsByCategoryId:{}",categoryId);
         List<Setmeal> setmeals = setmealService.getByCategoryId(categoryId);
         return Result.success(setmeals);
+    }
+
+
+    /**
+     *  根据套裁id获取菜品集合
+     * @param id setmeal id path
+     * @return list
+     */
+    @GetMapping("/dish/{id}")
+    @ApiOperation("根据套餐id查询包含的菜品")
+    public Result<List<DishItemVO>> getDishesBySetmealId(@PathVariable Long id){
+        log.info("根据套餐id查询包含的菜品:{}",id);
+        List<DishItemVO> list =  setmealService.getDishesBySetmealId(id);
+        return Result.success(list);
     }
 }

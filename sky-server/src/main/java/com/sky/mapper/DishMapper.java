@@ -75,4 +75,10 @@ public interface DishMapper {
     List<Dish> getByCategoryId(Long categoryId);
 
 
+    /**
+     * f根据菜品id集合获取菜品数据
+     * @param dishIds list
+     * @return dishList
+     */
+    List<Dish> getByDishIds(List<Long> dishIds);
 }

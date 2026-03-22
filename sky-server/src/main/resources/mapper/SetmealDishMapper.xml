@@ -19,7 +19,7 @@
         </foreach>
     </delete>
 
-    <!--    参数为Long星数组，需要动态sql拼接查询-->
+    <!--    参数为Long数组，需要动态sql拼接查询-->
     <select id="getSetmealIdsByDishId" resultType="java.lang.Long">
         select setmeal_id from setmeal_dish where dish_id in
         <foreach collection="dishIds" item="dishId" separator="," open="(" close=")">

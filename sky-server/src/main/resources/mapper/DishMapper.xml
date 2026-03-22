@@ -32,7 +32,7 @@
                 #{id}
         </foreach>
     </delete>
-<!--    更新菜品数据-->
+    <!--    更新菜品数据-->
     <update id="updateDish">
         update dish
         <set>
@@ -45,4 +45,13 @@
         </set>
         where id = #{id}
     </update>
+
+
+    <!--根据菜品id集合获取菜品数据-->
+    <select id="getByDishIds" resultType="com.sky.entity.Dish">
+        select * from dish where id in
+        <foreach collection="dishIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

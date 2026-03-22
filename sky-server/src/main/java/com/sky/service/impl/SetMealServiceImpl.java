@@ -4,13 +4,20 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
+import com.sky.entity.DishFlavor;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
+import com.sky.mapper.DishFlavorMapper;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetMealMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
+import com.sky.service.DishService;
 import com.sky.service.SetMealService;
+import com.sky.vo.DishItemVO;
+import com.sky.vo.DishVO;
 import com.sky.vo.SetmealVO;
 import io.swagger.models.auth.In;
 import org.springframework.beans.BeanUtils;
@@ -18,8 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class SetMealServiceImpl implements SetMealService {
@@ -29,6 +36,9 @@ public class SetMealServiceImpl implements SetMealService {
 
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+
+    @Autowired
+    private DishMapper dishMapper;
 
     /**
      * 插入套餐
@@ -146,5 +156,44 @@ public class SetMealServiceImpl implements SetMealService {
      */
     public List<Setmeal> getByCategoryId(Long categoryId) {
         return setMealMapper.getSetmealsById(categoryId);
+    }
+
+
+
+    /**
+     * 根据套餐id获取菜品数据
+     * @param id setmeal id
+     * @return list
+     */
+    public List<DishItemVO> getDishesBySetmealId(Long id) {
+        // 获取套餐关联的菜品信息
+        List<SetmealDish> setmealDishes = setmealDishMapper.getById(id);
+        if (setmealDishes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 构建 dishId -> copies 的映射，便于后续填充份数
+        Map<Long, Integer> dishIdToCopies = setmealDishes.stream()
+                .collect(Collectors.toMap(
+                        SetmealDish::getDishId,
+                        SetmealDish::getCopies,
+                        (existing, replacement) -> existing // 若同一菜品在套餐中出现多次，保留第一个份数
+                ));
+
+        // 获取所有菜品ID
+        List<Long> dishIds = new ArrayList<>(dishIdToCopies.keySet());
+
+        // 查询菜品详细信息
+        List<Dish> dishes = dishMapper.getByDishIds(dishIds);
+
+        // 构建返回结果
+        return dishes.stream()
+                .map(dish -> {
+                    DishItemVO vo = new DishItemVO();
+                    BeanUtils.copyProperties(dish, vo);      // 复制菜品基础属性
+                    vo.setCopies(dishIdToCopies.get(dish.getId())); // 设置份数
+                    return vo;
+                })
+                .collect(Collectors.toList());
     }
 }

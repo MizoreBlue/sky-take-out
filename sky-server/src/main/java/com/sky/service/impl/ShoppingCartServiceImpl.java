@@ -21,6 +21,7 @@ import com.sky.utils.HttpClientUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -110,5 +111,29 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
      */
     public void clean() {
         shoppingCartMapper.cleanByUserId(BaseContext.getCurrentId());
+    }
+
+
+    /**
+     * 删除购物车中的一个商品
+     * @param shoppingCartDTO body
+     */
+    @Transactional
+    public void sub(ShoppingCartDTO shoppingCartDTO) {
+//        先查询对应的菜品数据
+        ShoppingCart cart = new ShoppingCart();
+        BeanUtils.copyProperties(shoppingCartDTO, cart);
+        List<ShoppingCart> list = shoppingCartMapper.list(cart);
+
+        Integer number = list.get(0).getNumber();
+        if ( number > 1) {
+//            购物车对应的菜品数据减少1份
+            list.get(0).setNumber(number - 1);
+//           更新购物车
+            shoppingCartMapper.updateNumberById(list.get(0));
+        } else if (number == 1) {
+//            直接删除该条购物车数据
+            shoppingCartMapper.deleteById(list.get(0).getId());
+        }
     }
 }
