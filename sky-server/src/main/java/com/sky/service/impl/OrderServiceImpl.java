@@ -71,6 +71,10 @@ public class OrderServiceImpl implements OrderService {
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
 
+//        拼接`地址
+        String address = addressBook.getProvinceName()+addressBook.getCityName()+
+                addressBook.getDistrictName()+addressBook.getDetail();
+
 
 //        插叙当前用户车购物车数据
         ShoppingCart cart = new ShoppingCart();
@@ -91,7 +95,7 @@ public class OrderServiceImpl implements OrderService {
         orders.setNumber(String.valueOf(System.currentTimeMillis()));//当前时间戳
         orders.setPhone(addressBook.getPhone());
         orders.setConsignee(addressBook.getConsignee());
-//        TODO 也许存在需要但尚未插入的数据
+        orders.setAddress(address);
         orders.setUserId(BaseContext.getCurrentId());
 
         orderMapper.insert(orders);

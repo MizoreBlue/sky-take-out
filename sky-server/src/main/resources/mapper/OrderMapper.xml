@@ -47,7 +47,7 @@
         where id = #{id}
     </update>
 
-<!--    查询历史订单-->
+    <!--    查询历史订单-->
     <select id="pageQuery" resultType="com.sky.entity.Orders">
         select * from orders
         <where>
@@ -60,4 +60,20 @@
         </where>
         order by order_time
     </select>
+
+
+
+
+    <!--    批量更新订单数据-->
+    <update id="updates" parameterType="list">
+        <foreach collection="list" item="order" separator=";">
+            update orders
+            <set>
+                <if test="order.status != null">status = #{order.status},</if>
+                <if test="order.cancelTime != null">cancel_Time = #{order.cancelTime},</if>
+                <if test="order.cancelReason != null">cancel_Reason = #{order.cancelReason},</if>
+            </set>
+            where id = #{order.id}
+        </foreach>
+    </update>
 </mapper>
