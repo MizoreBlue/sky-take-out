@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
@@ -17,10 +18,12 @@ import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.task.WebSocketTask;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.websocket.WebSocketServer;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+
+
+    @Autowired
+    private WebSocketServer webSocketServer;
 
 
 
@@ -175,6 +182,16 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+
+//        通过 websocket向客户端推送消息 type orderId content
+        HashMap map = new HashMap();
+        map.put("type",1);//1表示来的提醒，2表示客户催单
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号："+outTradeNo);
+        String message = JSONUtils.toJSONString(map);
+//        群发信息 管理端
+        webSocketServer.sendToAllClient(message);
     }
 
 
@@ -184,6 +201,19 @@ public class OrderServiceImpl implements OrderService {
      */
 //    TODO 催单
     public void reminder(Long id) {
+//        根据订单id查询订单
+        Orders orders = orderMapper.getByOrderId(id);
+        if (orders == null) {
+//            抛出订单异常
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        //        通过 websocket向客户端推送消息 type orderId content
+        HashMap map = new HashMap();
+        map.put("type",2);//1表示来的提醒，2表示客户催单
+        map.put("orderId",id);
+        map.put("content","订单号："+orders.getNumber());
+        String message = JSONUtils.toJSONString(map);
+        webSocketServer.sendToAllClient(message);
     }
 
 
