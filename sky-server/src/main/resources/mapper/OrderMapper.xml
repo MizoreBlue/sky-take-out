@@ -62,8 +62,6 @@
     </select>
 
 
-
-
     <!--    批量更新订单数据-->
     <update id="updates" parameterType="list">
         <foreach collection="list" item="order" separator=";">
@@ -76,4 +74,14 @@
             where id = #{order.id}
         </foreach>
     </update>
+
+<!--    根据订单状态和开始-结束时间查询订单状态-->
+    <select id="sumByMap" resultType="java.lang.Double">
+        select sum(amount) from orders
+        <where>
+            <if test="beginTime != null">and order_time &gt; #{beginTime}</if>
+            <if test="endTime != null">and order_time &lt; #{endTime}</if>
+            <if test="status != null">and status &gt; #{status}</if>
+        </where>
+    </select>
 </mapper>

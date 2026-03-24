@@ -199,7 +199,6 @@ public class OrderServiceImpl implements OrderService {
      * 催单
      * @param id 订单 id
      */
-//    TODO 催单
     public void reminder(Long id) {
 //        根据订单id查询订单
         Orders orders = orderMapper.getByOrderId(id);
@@ -234,7 +233,6 @@ public class OrderServiceImpl implements OrderService {
 
         if (orderList != null && !orderList.isEmpty()) {
 
-//            TODO 由于订单未支付超时自动取消。需要设置订单状态
 //        查出来的订单不为空 提取订单Id列表
             List<Long> orderIds = orderList.stream()
                     .map(Orders::getId)
