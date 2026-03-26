@@ -6,6 +6,7 @@ import com.sky.mapper.OrderMapper;
 import com.sky.mapper.ReportMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.apache.commons.lang.StringUtils;
@@ -51,6 +52,7 @@ public class ReportServiceImpl implements ReportService {
             dateList.add(begin);
         }
 
+        Map map = new HashMap();
 
 //        TODO 待优化 将多次查询改为单次查询
         for (LocalDate date : dateList) {
@@ -58,7 +60,6 @@ public class ReportServiceImpl implements ReportService {
             LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
             LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
 //            select sum(amount) from order where order_time > beginTime and order_time < endTime and status = 5
-            Map map = new HashMap();
             map.put("beginTime", beginTime);
             map.put("endTime", endTime);
             map.put("status", Orders.COMPLETED);
@@ -126,6 +127,71 @@ public class ReportServiceImpl implements ReportService {
                 .dateList(StringUtils.join(dataList,","))
                 .newUserList(StringUtils.join(newUserList,","))
                 .totalUserList(StringUtils.join(totalUserList,","))
+                .build();
+    }
+
+
+    /**
+     * 订单数据统计
+     * @param begin 开始时间
+     * @param end 结束时间
+     * @return 视图对象
+     */
+    public OrderReportVO getOrdersStatistics(LocalDate begin, LocalDate end) {
+
+//        获取日期集合 包含起止日期
+        List<LocalDate> dataList = new ArrayList<>();
+        dataList.add(begin);
+        while (begin.isBefore(end)) {
+            begin = begin.plusDays(1);
+            dataList.add(begin);
+        }
+
+
+        Integer totalOrdesCount = 0;
+        Integer validOrderCount = 0;
+        HashMap map = new HashMap(); //用于存储数据库查询参数
+        List CurrentDayTotallist = new ArrayList();
+        List CurrentDayVaildlist = new ArrayList();
+
+//        根据日期查询当天的数据
+//        TODO 多次循环待优化为单次循环查询数据库
+        for (LocalDate date : dataList) {
+//            查询当天订单有效总数 select count(id) from orders where order_time > beginTime and order_time < endTime and status = 5;
+//            当天时间的最大值和最小值
+            LocalDateTime beginTime = LocalDateTime.of(date, LocalTime.MIN);
+            LocalDateTime endTime = LocalDateTime.of(date, LocalTime.MAX);
+
+//            查询当前的订单总数 select count(id) from orders where order_time > beginTime and order_time < endTime;
+            map.put("beginTime", beginTime);
+            map.put("endTime", endTime);
+            Integer totalOrders = orderMapper.sumOrdersByMap(map); //当天订单总数
+            map.put("status", Orders.COMPLETED);
+            Integer validOrders = orderMapper.sumOrdersByMap(map); //当天有效订单总数
+            map.put("status", null);//为下一次订单数据查询置空
+
+//           当日数据集合
+//           若查询到的数据为空
+            totalOrders = totalOrders == null ? 0 : totalOrders;
+            validOrders = validOrders == null ? 0 : validOrders;
+            CurrentDayTotallist.add(totalOrders);
+            CurrentDayVaildlist.add(validOrders);
+
+//          累加当天的订单数据
+            totalOrdesCount += totalOrders;
+            validOrderCount += validOrders;
+
+        }
+//            总的订单完成率
+            Double completedRate = (double) (validOrderCount/totalOrdesCount);
+
+        return OrderReportVO.builder()
+                .dateList(StringUtils.join(dataList,","))
+                .totalOrderCount(totalOrdesCount)
+                .validOrderCount(validOrderCount)
+                .orderCompletionRate(completedRate) //总订单完成率计算
+                .validOrderCountList(StringUtils.join(CurrentDayVaildlist,",")) //当日有效订单集合
+                .orderCountList(StringUtils.join(CurrentDayTotallist,",")) //当日订单总数集合
                 .build();
     }
 }

@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -77,4 +78,12 @@ public interface OrderMapper {
      * @return Double
      */
     Double sumByMap(Map map);
+
+
+    /**
+     * 计算订单总数
+     * @param map
+     * @return
+     */
+    Integer sumOrdersByMap(HashMap map);
 }
