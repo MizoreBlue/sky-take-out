@@ -95,4 +95,19 @@
             <if test="status != null">and status = #{status}</if>
         </where>
     </select>
+
+
+    <select id="getSalesTop10" resultType="com.sky.dto.GoodsSalesDTO">
+            select od.name,count(od.number) number from order_detail od,orders o
+            <where>
+                <if test="beginTime != null">and o.order_time &gt; #{beginTime}</if>
+                <if test="endTime != null">and o.order_time &lt; #{endTime}</if>
+            </where>
+            and status = 5 and od.order_id = o.id
+            group by od.name
+            order by number desc
+            limit 0,10
+    </select>
+
+
 </mapper>

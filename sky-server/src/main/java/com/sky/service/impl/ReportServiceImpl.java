@@ -1,16 +1,19 @@
 package com.sky.service.impl;
 
-import com.alibaba.druid.support.json.JSONUtils;
+import com.sky.dto.GoodsSalesDTO;
+import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
+import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
-import com.sky.mapper.ReportMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -20,18 +23,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ReportServiceImpl implements ReportService {
 
     @Autowired
-    private ReportMapper reportMapper;
-
-
-    @Autowired
     private OrderMapper orderMapper;
+
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
 
     /**
      * 返回营业额数据统计
@@ -192,6 +196,38 @@ public class ReportServiceImpl implements ReportService {
                 .orderCompletionRate(completedRate) //总订单完成率计算
                 .validOrderCountList(StringUtils.join(CurrentDayVaildlist,",")) //当日有效订单集合
                 .orderCountList(StringUtils.join(CurrentDayTotallist,",")) //当日订单总数集合
+                .build();
+    }
+
+
+    /**
+     * 销量top10
+     * @param begin 开始时间
+     * @param end 结束时间
+     * @return 视图对象
+     */
+    public SalesTop10ReportVO getSalesTop10Report(LocalDate begin, LocalDate end) {
+
+//        设置起止时间
+        LocalDateTime beginTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endTime = LocalDateTime.of(end, LocalTime.MAX);
+
+//        获得热销商品数据
+        List<GoodsSalesDTO> salesTop10 = orderMapper.getSalesTop10(beginTime, endTime);
+
+
+//        获取所有商品名称集合
+        List<String> names = salesTop10.stream().map(GoodsSalesDTO::getName).collect(Collectors.toList());
+        List<Integer> numbers = salesTop10.stream().map(GoodsSalesDTO::getNumber).collect(Collectors.toList());
+//        处理得到的数据 转换为字符串
+        String nameList = StringUtils.join(names, ",");
+        String numberList = StringUtils.join(numbers, ",");
+
+
+//        封装并返回数据
+        return SalesTop10ReportVO.builder()
+                .nameList(nameList)
+                .numberList(numberList)
                 .build();
     }
 }

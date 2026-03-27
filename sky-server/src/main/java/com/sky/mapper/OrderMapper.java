@@ -2,9 +2,11 @@ package com.sky.mapper;
 
 
 import com.github.pagehelper.Page;
+import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import com.sky.vo.SalesTop10ReportVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -86,4 +88,13 @@ public interface OrderMapper {
      * @return
      */
     Integer sumOrdersByMap(HashMap map);
+
+
+
+    /**
+     * 统计指定时间内销量前十的商品
+     * @param beginTime 开始时间
+     * @param endTime 结束时间
+     */
+    List<GoodsSalesDTO> getSalesTop10(LocalDateTime beginTime, LocalDateTime endTime);
 }
