@@ -6,6 +6,7 @@ import com.sky.dto.GoodsSalesDTO;
 import com.sky.dto.OrdersDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
+import com.sky.vo.OrderOverViewVO;
 import com.sky.vo.SalesTop10ReportVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -97,4 +98,29 @@ public interface OrderMapper {
      * @param endTime 结束时间
      */
     List<GoodsSalesDTO> getSalesTop10(LocalDateTime beginTime, LocalDateTime endTime);
+
+
+    /**
+     * 获取当天的有效营业额
+     * @param beginTime
+     * @param endTime
+     * @return
+     */
+    @Select("select sum(amount) from orders where order_time >= #{beginTime} and order_time <= #{endTime} and status = 5")
+    Double getValidTurnover(LocalDateTime beginTime, LocalDateTime endTime);
+
+
+    /**
+     * 查询订单总览数据
+     * @return
+     */
+    @Select("SELECT " +
+            "   SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) AS waiting_orders, " +
+            "   SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS delivered_orders, " +
+            "   SUM(CASE WHEN status = 5 THEN 1 ELSE 0 END) AS completed_orders, " +
+            "   SUM(CASE WHEN status = 6 THEN 1 ELSE 0 END) AS cancelled_orders, " +
+            "   COUNT(*) AS all_orders " +
+            "FROM orders " +
+            "WHERE order_time >= #{beginTime} AND order_time <= #{endTime}")
+    OrderOverViewVO getOrderOverViewDate(LocalDateTime beginTime,LocalDateTime endTime);
 }

@@ -6,6 +6,7 @@ import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
 import com.sky.result.Result;
+import com.sky.vo.SetmealOverViewVO;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -63,4 +64,15 @@ public interface SetMealMapper {
 
     @Select("select * from setmeal where category_id = #{categoryId}")
     List<Setmeal> getSetmealsById(Long categoryId);
+
+
+    /**
+     * 获取套餐总览
+     * @return
+     */
+    @Select("select " +
+            "sum(case when status = 1 then 1 else 0 end) as sold," +
+            "sum(case when status = 0 then 1 else 0 end) as discontinued " +
+            "from setmeal")
+    SetmealOverViewVO getSetMealsOverView();
 }
