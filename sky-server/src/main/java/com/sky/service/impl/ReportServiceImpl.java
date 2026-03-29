@@ -3,19 +3,25 @@ package com.sky.service.impl;
 import com.sky.dto.GoodsSalesDTO;
 import com.sky.entity.OrderDetail;
 import com.sky.entity.Orders;
+import com.sky.exception.OrderBusinessException;
 import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkSpaceService;
+import com.sky.vo.*;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -35,7 +41,8 @@ public class ReportServiceImpl implements ReportService {
     private UserMapper userMapper;
 
     @Autowired
-    private OrderDetailMapper orderDetailMapper;
+    private WorkSpaceService workSpaceService;
+
 
     /**
      * 返回营业额数据统计
@@ -229,5 +236,78 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(nameList)
                 .numberList(numberList)
                 .build();
+    }
+
+
+
+    /**
+     * 导出运营数据报表
+     * 当天以前的三十天
+     * @param response 给前端发送响应数据
+     */
+    public void exportExcel(HttpServletResponse response) {
+//        设置起止时间限制
+        LocalDate dateBegin = LocalDate.now().minusDays(30);
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+
+//        查询概况数据
+        BusinessDataVO businessDate = workSpaceService.getBusinessDate(
+                LocalDateTime.of(dateBegin,LocalTime.MIN),
+                LocalDateTime.of(dateEnd,LocalTime.MAX));
+
+//        将查询到的数据写入到excel文件当中
+//        获取类路径 从而获得输入流对象像
+//        导出报表只导出数据，不需要创建新的文件，读取带有相应格式的模板文件
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板文件.xlsx");
+
+        try {
+//             基于模板文件创建一个新的Excel 文件
+            if (in == null) {
+                throw new OrderBusinessException("模板文件未找到");
+            }
+            XSSFWorkbook excel = new XSSFWorkbook(in);;
+            XSSFSheet sheet1 = excel.getSheet("sheet1");
+
+//            填充数据--时间
+            sheet1.getRow(2).getCell(0).setCellValue("时间: " + dateBegin + "至" + dateBegin);
+
+//            设置概览数据
+            XSSFRow row = sheet1.getRow(4);
+            row.getCell(1).setCellValue(businessDate.getTurnover());
+            row.getCell(3).setCellValue(businessDate.getOrderCompletionRate());
+            row.getCell(5).setCellValue(businessDate.getNewUsers());
+
+            row = sheet1.getRow(5);
+            row.getCell(1).setCellValue(businessDate.getValidOrderCount());
+            row.getCell(3).setCellValue(businessDate.getUnitPrice());
+
+//            设置三十天的明细数据
+            for (int i = 0; i < 30; i++) {
+//                TODO  待优化 ，将循环改为单次查询
+                LocalDate date = dateBegin.plusDays(i);
+                BusinessDataVO businessData = workSpaceService.getBusinessDate(
+                        LocalDateTime.of(date, LocalTime.MIN),
+                        LocalDateTime.of(date, LocalTime.MAX));
+//                获得某一行
+                 row = sheet1.createRow(i+8);
+                 row.createCell(0).setCellValue(date.toString());
+                 row.createCell(1).setCellValue(businessData.getTurnover());
+                 row.createCell(2).setCellValue(businessData.getValidOrderCount());
+                 row.createCell(3).setCellValue(businessData.getOrderCompletionRate());
+                 row.createCell(4).setCellValue(businessData.getUnitPrice());
+                 row.createCell(5).setCellValue(businessData.getNewUsers());
+            }
+
+
+//        导出报表 ，通过输入流，将excel文件下载到客户端浏览器
+            ServletOutputStream out = response.getOutputStream();
+            excel.write(out);
+
+//            关闭资源
+            excel.close();
+            out.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

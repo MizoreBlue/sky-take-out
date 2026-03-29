@@ -49,10 +49,8 @@ public class WorkSpaceServiceImpl implements WorkSpaceService {
      * 获取今日营运数据
      * @return 视图对象
      */
-    public BusinessDataVO getBusinessDate() {
+    public BusinessDataVO getBusinessDate(LocalDateTime beginTime,LocalDateTime endTime) {
 //        设置当天边界时间
-        LocalDateTime beginTime = LocalDateTime.now().with(LocalTime.MIN);
-        LocalDateTime endTime = LocalDateTime.now().with(LocalTime.MAX);
 
 //         构建查询参数
         HashMap<String,Object> params = new HashMap<>();
