@@ -7,6 +7,7 @@ import com.sky.dto.OrdersDTO;
 import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.entity.Orders;
 import com.sky.vo.OrderOverViewVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.SalesTop10ReportVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -115,12 +116,26 @@ public interface OrderMapper {
      * @return
      */
     @Select("SELECT " +
-            "   SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) AS waiting_orders, " +
-            "   SUM(CASE WHEN status = 4 THEN 1 ELSE 0 END) AS delivered_orders, " +
-            "   SUM(CASE WHEN status = 5 THEN 1 ELSE 0 END) AS completed_orders, " +
-            "   SUM(CASE WHEN status = 6 THEN 1 ELSE 0 END) AS cancelled_orders, " +
-            "   COUNT(*) AS all_orders " +
+            "   count(CASE WHEN status = 2 THEN 1 END) AS waiting_orders, " +
+            "   count(CASE WHEN status = 4 THEN 1 END) AS delivered_orders, " +
+            "   count(CASE WHEN status = 5 THEN 1 END) AS completed_orders, " +
+            "   count(CASE WHEN status = 6 THEN 1 END) AS cancelled_orders, " +
+            "   count(*) AS all_orders " +
             "FROM orders " +
             "WHERE order_time >= #{beginTime} AND order_time <= #{endTime}")
     OrderOverViewVO getOrderOverViewDate(LocalDateTime beginTime,LocalDateTime endTime);
+
+
+    /**
+     * 订单分页查询
+     * @param ordersPageQueryDTO
+     * @return
+     */
+    Page<Orders> pageQueryByDTO(OrdersPageQueryDTO ordersPageQueryDTO);
+
+    /**
+     * 各个状态的订单数量统计
+     * @return
+     */
+    OrderStatisticsVO getOrderStatistic();
 }

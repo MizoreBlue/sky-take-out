@@ -110,4 +110,28 @@
     </select>
 
 
+<!--    订单分页查询-->
+    <select id="pageQueryByDTO" resultType="com.sky.entity.Orders">
+        select * from orders
+        <where>
+            <if test="beginTime != null">and order_time &gt; #{beginTime}</if>
+            <if test="endTime != null">and order_time &lt; #{endTime}</if>
+            <if test="number != null">and number = #{number}</if>
+            <if test="phone != null">and phone = #{phone}</if>
+            <if test="status != null">and status = #{status}</if>
+        </where>
+        order by order_time desc
+    </select>
+
+
+<!--    各个状态的订单数量统计-->
+    <select id="getOrderStatistic" resultType="com.sky.vo.OrderStatisticsVO">
+        select
+            count(case when status = 2 then 1 end) as  toBeConfirmed,
+            count(case when status = 3 then 1 end) as  confirmed,
+            count(case when status = 4 then 1 end) as  deliveryInProgress
+        from orders
+    </select>
+
+
 </mapper>
