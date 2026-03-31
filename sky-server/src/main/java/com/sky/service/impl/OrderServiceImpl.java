@@ -403,4 +403,91 @@ public class OrderServiceImpl implements OrderService {
 //        使用sql 语句一步到位
         return orderMapper.getOrderStatistic();
     }
+
+
+    /**
+     * 完成订单
+     * @param id orderId
+     */
+    public void orderComplete(Long id) {
+        Orders order = orderMapper.getByOrderId(id);
+//        只有订单状态为已支付，且不为空时才能完成订单 且在派送中
+        if (order != null && order.getPayStatus().equals(Orders.PAID ) && order.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+
+            order.setStatus(Orders.COMPLETED);
+            orderMapper.update(order);
+        } else  {
+//           其他情况抛异常
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+    }
+
+
+    /**
+     * 拒单
+     * @param ordersRejectionDTO data transport object
+     */
+    @Transactional
+    public void orderReject(OrdersRejectionDTO ordersRejectionDTO) {
+//        获取订单数据
+        Orders order = orderMapper.getByOrderId(ordersRejectionDTO.getId());
+
+//        其他状态抛异常
+        Integer status = order.getStatus();
+        if (!Objects.equals(status, Orders.TO_BE_CONFIRMED)) throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+
+//        已经支付时
+        if (order.getPayStatus().equals(Orders.PAID)) {
+//           执行退款程序
+            try {
+//                this.refund(order);
+                order.setPayStatus(Orders.REFUND);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+            //            修改订单状态
+            order.setStatus(Orders.CANCELLED);
+            order.setCancelTime(LocalDateTime.now());
+            order.setRejectionReason(ordersRejectionDTO.getRejectionReason());
+            orderMapper.update(order);
+    }
+
+
+    /**
+     * 接单
+     * @param ordersConfirmDTO orderId
+     */
+    public void orderConfirm(OrdersConfirmDTO ordersConfirmDTO) {
+        Orders orders = orderMapper.getByOrderId(ordersConfirmDTO.getId());
+        if (orders != null && orders.getStatus().equals(Orders.TO_BE_CONFIRMED)) {
+            orders.setStatus(Orders.COMPLETED);
+            orderMapper.update(orders);
+        } else {
+//            其他情况抛异常
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+    }
+
+
+    /**
+     * 订单派送
+     * @param id OrderId
+     */
+    public void orderDelivery(Long id) {
+        Orders order = orderMapper.getByOrderId(id);
+//        只有订单状态为 已支付、已确认时。才能点击进行派送
+        if (order.getStatus().equals(Orders.CONFIRMED) && order.getPayStatus().equals(Orders.PAID)) {
+            order.setStatus(Orders.DELIVERY_IN_PROGRESS);
+            order.setDeliveryStatus(1);
+            order.setDeliveryTime(LocalDateTime.now());
+            orderMapper.update(order);
+        }
+        else  {
+//            其他情况抛异常
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+    }
 }

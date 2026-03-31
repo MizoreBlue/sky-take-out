@@ -1,16 +1,12 @@
 package com.sky.service;
 
-import com.sky.dto.OrdersCancelDTO;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.Orders;
 import com.sky.result.PageResult;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
-import org.springframework.core.annotation.Order;
 
 public interface OrderService {
 
@@ -102,4 +98,32 @@ public interface OrderService {
      * @return
      */
     OrderStatisticsVO getOrderStatistics();
+
+
+    /**
+     * 完成订单
+     * @param id orderId
+     */
+    void orderComplete(Long id);
+
+
+    /**
+     * 拒单
+     * @param ordersRejectionDTO data transport object
+     */
+    void orderReject(OrdersRejectionDTO ordersRejectionDTO);
+
+
+    /**
+     * 接单
+     * @param ordersConfirmDTO orderId
+     */
+    void orderConfirm(OrdersConfirmDTO ordersConfirmDTO);
+
+
+    /**
+     * 订单派送
+     * @param id OrderId
+     */
+    void orderDelivery(Long id);
 }
