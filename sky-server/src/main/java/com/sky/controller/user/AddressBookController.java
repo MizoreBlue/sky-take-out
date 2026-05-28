@@ -17,7 +17,7 @@ import java.util.List;
 @Slf4j
 @RequestMapping("/user/addressBook")
 @Api(tags = "C端-地址簿接口")
-public class addressBookController {
+public class AddressBookController {
 
     @Autowired
     private AddressBookService addressBookService;

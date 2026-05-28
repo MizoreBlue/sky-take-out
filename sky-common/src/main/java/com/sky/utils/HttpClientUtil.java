@@ -13,7 +13,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.springframework.context.annotation.Bean;
 
 import java.io.IOException;
 import java.net.URI;
@@ -26,7 +25,7 @@ import java.util.Map;
  */
 public class HttpClientUtil {
 
-    static final  int TIMEOUT_MSEC = 5 * 1000;
+    static final  int TIMEOUT_MSES = 5 * 1000;
 
     /**
      * 发送GET方式请求
@@ -172,9 +171,9 @@ public class HttpClientUtil {
     }
     private static RequestConfig builderRequestConfig() {
         return RequestConfig.custom()
-                .setConnectTimeout(TIMEOUT_MSEC)
-                .setConnectionRequestTimeout(TIMEOUT_MSEC)
-                .setSocketTimeout(TIMEOUT_MSEC).build();
+                .setConnectTimeout(TIMEOUT_MSES)
+                .setConnectionRequestTimeout(TIMEOUT_MSES)
+                .setSocketTimeout(TIMEOUT_MSES).build();
     }
 
 }

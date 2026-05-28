@@ -269,7 +269,7 @@ public class ReportServiceImpl implements ReportService {
             XSSFSheet sheet1 = excel.getSheet("sheet1");
 
 //            填充数据--时间
-            sheet1.getRow(2).getCell(0).setCellValue("时间: " + dateBegin + "至" + dateBegin);
+            sheet1.getRow(2).getCell(0).setCellValue("时间: " + dateBegin + "至" + dateEnd);
 
 //            设置概览数据
             XSSFRow row = sheet1.getRow(4);
